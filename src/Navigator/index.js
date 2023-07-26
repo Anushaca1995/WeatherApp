@@ -1,7 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import WeatherHome from '../containers/WeatherHome';
-import WeatherList from '../containers/WeatherList';
+import {WeatherHome, WeatherList} from '../containers';
 const Navigator = () => {
   const Stack = createNativeStackNavigator();
 

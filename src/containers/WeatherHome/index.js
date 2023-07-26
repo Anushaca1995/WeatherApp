@@ -6,9 +6,9 @@ import {CustomButton} from '../../components';
 const WeatherHome = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <Text>Weather Home</Text>
+      <Text style={styles.caption}>Weather Home</Text>
       <CustomButton
-        buttonText={'Go to forecast'}
+        buttonText={'Go to Forecast'}
         handleClick={() => navigation.navigate('ForeCast', {})}
       />
     </View>
