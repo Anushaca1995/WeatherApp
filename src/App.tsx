@@ -4,15 +4,15 @@
  *
  * @format
  */
-
+import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
-import {Text, useColorScheme, View} from 'react-native';
+import Navigator from './Navigator';
 
 function App(): JSX.Element {
   return (
-    <View style={{flex: 1}}>
-      <Text style={{textAlign: 'center'}}>Weather App</Text>
-    </View>
+    <NavigationContainer>
+      <Navigator />
+    </NavigationContainer>
   );
 }
 
