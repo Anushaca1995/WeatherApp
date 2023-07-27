@@ -27,4 +27,5 @@ export default StyleSheet.create({
     alignItems: "center",
     margin: 20,
   },
+  weatherIcon: { width: 100, height: 100 },
 });

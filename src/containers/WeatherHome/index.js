@@ -92,7 +92,7 @@ const WeatherHome = ({ navigation }) => {
       <View style={styles.weatherView}>
         <TouchableOpacity onPress={fetchForeCast}>
           <Image
-            style={{ width: 40, height: 40, borderRadius: 40 }}
+            style={styles.refresh}
             source={{
               uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
             }}
@@ -100,7 +100,7 @@ const WeatherHome = ({ navigation }) => {
         </TouchableOpacity>
         {imageUrl && (
           <Image
-            style={{ width: 200, height: 200 }}
+            style={styles.icon}
             source={{
               uri: imageUrl,
             }}
@@ -131,40 +131,23 @@ const WeatherHome = ({ navigation }) => {
 
   const renderSearch = () => {
     return (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-        }}
-      >
+      <View style={styles.searchView}>
         <TextInput
-          style={{
-            padding: 10,
-            backgroundColor: "#fff2e6",
-            margin: 10,
-            borderRadius: 10,
-            width: 250,
-          }}
+          style={styles.searchInput}
           onChangeText={(newText) => setLocSearch(newText)}
           defaultValue={locSearch}
           placeholder="Search Location .."
         />
-        <TouchableOpacity style={{ margin: 10 }} onPress={checkLocPermission}>
+        <TouchableOpacity onPress={checkLocPermission}>
           <Image
-            style={{ width: 40, height: 40, borderRadius: 40 }}
+            style={styles.yourLocIcon}
             source={{
               uri: "https://cdn-icons-png.flaticon.com/256/3711/3711245.png",
             }}
           />
         </TouchableOpacity>
         <TouchableOpacity
-          style={{
-            backgroundColor: "#660022",
-            padding: 10,
-            borderRadius: 10,
-            margin: 10,
-          }}
+          style={styles.enterButton}
           onPress={handleSearchEnter}
         >
           <Text style={{ color: "white", fontWeight: "700" }}>Enter</Text>
@@ -178,13 +161,13 @@ const WeatherHome = ({ navigation }) => {
       {renderSearch()}
       <Text style={styles.caption}>Weather @ {locName}</Text>
       {isLoading ? (
-        <ActivityIndicator size="large" color="purple" />
+        <ActivityIndicator size="large" color="#660022" />
       ) : (
         weatherData()
       )}
       <CustomButton
         buttonText={"Go to Forecast"}
-        handleClick={() => navigation.navigate("ForeCast", {})}
+        handleClick={() => navigation.navigate("ForeCast", { userLoc })}
       />
     </View>
   );
