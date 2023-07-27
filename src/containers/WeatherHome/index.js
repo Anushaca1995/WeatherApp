@@ -51,7 +51,7 @@ const WeatherHome = ({ navigation }) => {
       setForeCast(data);
       setCurrent(data.current.weather[0]);
       setImageUrl(
-        `http://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`
+        `https://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`
       );
     }
     setIsLoading(false);
@@ -78,7 +78,7 @@ const WeatherHome = ({ navigation }) => {
           <Image
             style={{ width: 200, height: 200 }}
             source={{
-              uri: "http://openweathermap.org/img/wn/01n@4x.png",
+              uri: imageUrl,
             }}
           />
         )}
