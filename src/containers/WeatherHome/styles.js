@@ -4,7 +4,7 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#ffbf80",
+    backgroundColor: "#ffe6cc",
   },
   caption: {
     fontSize: 20,
@@ -29,5 +29,31 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     margin: 20,
+  },
+  refresh: { width: 40, height: 40, borderRadius: 40 },
+  icon: { width: 200, height: 200 },
+  searchView: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  searchInput: {
+    padding: 10,
+    backgroundColor: "#fff2e6",
+    margin: 10,
+    borderRadius: 10,
+    width: 250,
+  },
+  yourLocIcon: {
+    margin: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 40,
+  },
+  enterButton: {
+    backgroundColor: "#660022",
+    padding: 10,
+    borderRadius: 10,
+    margin: 10,
   },
 });

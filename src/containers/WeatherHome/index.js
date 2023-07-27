@@ -19,17 +19,23 @@ const WeatherHome = ({ navigation }) => {
   const [imageUrl, setImageUrl] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [locSearch, setLocSearch] = useState("");
+  const [locName, setLocName] = useState();
   const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
   let weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
   let searchUrl = `https://api.openweathermap.org/geo/1.0/direct?exclude=minutely&units=metric&limit=5&appid=${weatherAPIKey}`;
 
   useEffect(() => {
+    checkLocPermission();
+  }, []);
+
+  const checkLocPermission = () => {
     LocHelper.checkLocationPermission(
       () => {
         LocHelper.fetchUserLocation(
           (loc) => {
             setUserLoc(loc);
             console.log("User Location", loc);
+            setLocName("Your Location");
           },
           (error) => {
             console.log(error);
@@ -41,7 +47,7 @@ const WeatherHome = ({ navigation }) => {
         console.log(err);
       }
     );
-  }, []);
+  };
 
   useEffect(() => {
     fetchForeCast();
@@ -57,7 +63,6 @@ const WeatherHome = ({ navigation }) => {
     } else {
       const data = await response.json();
       console.log("search url data", data);
-      Alert.alert(data[0].name);
       setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
     }
     setIsLoading(false);
@@ -87,7 +92,7 @@ const WeatherHome = ({ navigation }) => {
       <View style={styles.weatherView}>
         <TouchableOpacity onPress={fetchForeCast}>
           <Image
-            style={{ width: 40, height: 40, borderRadius: 40 }}
+            style={styles.refresh}
             source={{
               uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
             }}
@@ -95,7 +100,7 @@ const WeatherHome = ({ navigation }) => {
         </TouchableOpacity>
         {imageUrl && (
           <Image
-            style={{ width: 200, height: 200 }}
+            style={styles.icon}
             source={{
               uri: imageUrl,
             }}
@@ -117,6 +122,8 @@ const WeatherHome = ({ navigation }) => {
   const handleSearchEnter = () => {
     if (locSearch != "") {
       fetchLocSearch();
+      setLocName(locSearch);
+      setLocSearch("");
     } else {
       Alert.alert("Empty Search", "Please enter location");
     }
@@ -124,30 +131,26 @@ const WeatherHome = ({ navigation }) => {
 
   const renderSearch = () => {
     return (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          alignItems: "center",
-        }}
-      >
+      <View style={styles.searchView}>
         <TextInput
-          style={{
-            padding: 10,
-            backgroundColor: "#fff2e6",
-            margin: 10,
-            borderRadius: 10,
-            width: 300,
-          }}
+          style={styles.searchInput}
           onChangeText={(newText) => setLocSearch(newText)}
           defaultValue={locSearch}
           placeholder="Search Location .."
         />
+        <TouchableOpacity onPress={checkLocPermission}>
+          <Image
+            style={styles.yourLocIcon}
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/256/3711/3711245.png",
+            }}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
-          style={{ backgroundColor: "white", padding: 10, borderRadius: 10 }}
+          style={styles.enterButton}
           onPress={handleSearchEnter}
         >
-          <Text>Enter</Text>
+          <Text style={{ color: "white", fontWeight: "700" }}>Enter</Text>
         </TouchableOpacity>
       </View>
     );
@@ -156,15 +159,15 @@ const WeatherHome = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {renderSearch()}
-      <Text style={styles.caption}>Weather On Your Location</Text>
+      <Text style={styles.caption}>Weather @ {locName}</Text>
       {isLoading ? (
-        <ActivityIndicator size="large" color="purple" />
+        <ActivityIndicator size="large" color="#660022" />
       ) : (
         weatherData()
       )}
       <CustomButton
         buttonText={"Go to Forecast"}
-        handleClick={() => navigation.navigate("ForeCast", {})}
+        handleClick={() => navigation.navigate("ForeCast", { userLoc })}
       />
     </View>
   );

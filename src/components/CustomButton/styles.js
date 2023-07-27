@@ -4,7 +4,7 @@ export default StyleSheet.create({
   button: {
     margin: 10,
     textAlign: "center",
-    backgroundColor: "#400080",
+    backgroundColor: "#660022",
     justifyContent: "center",
     color: "white",
     padding: 10,

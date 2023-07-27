@@ -8,43 +8,19 @@ import {
   FlatList,
 } from "react-native";
 import styles from "./styles";
-import { LocHelper } from "../../helpers";
 
-const WeatherList = ({ navigation }) => {
-  const [userLoc, setUserLoc] = useState(null);
-  const [foreCast, setForeCast] = useState(null);
+const WeatherList = ({ navigation, route }) => {
+  const { userLoc } = route.params;
   const [weatherArr, SetWeatherArr] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [refresh, setRefresh] = useState(false);
   const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
   let foreCastUrl = `https://api.openweathermap.org/data/2.5/forecast?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
-
-  useEffect(() => {
-    LocHelper.checkLocationPermission(
-      () => {
-        LocHelper.fetchUserLocation(
-          (loc) => {
-            setUserLoc(loc);
-            console.log("User Location", loc);
-          },
-          (error) => {
-            console.log(error);
-            Alert.alert("Oops", "Something went wrong");
-          }
-        );
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-  }, []);
 
   useEffect(() => {
     fetchForeCast();
   }, [userLoc != null]);
 
   const fetchForeCast = async () => {
-    setRefresh(true);
     foreCastUrl = `${foreCastUrl}&lat=${userLoc.latitude}&lon=${userLoc.longitude}`;
     const response = await fetch(foreCastUrl);
     console.log("url", foreCastUrl);
@@ -53,7 +29,6 @@ const WeatherList = ({ navigation }) => {
     } else {
       const data = await response.json();
       console.log("forecast", data);
-      setForeCast(data);
       SetWeatherArr(data.list);
     }
     setIsLoading(false);
@@ -65,7 +40,7 @@ const WeatherList = ({ navigation }) => {
       <View style={styles.weatherView}>
         <View>
           <Image
-            style={{ width: 100, height: 100 }}
+            style={styles.weatherIcon}
             source={{
               uri: `https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`,
             }}
@@ -91,7 +66,7 @@ const WeatherList = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.caption}>Five Days ForeCast</Text>
       {isLoading ? (
-        <ActivityIndicator size="large" color="purple" />
+        <ActivityIndicator size="large" color="#660022" />
       ) : (
         renderWeatherList()
       )}

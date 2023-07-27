@@ -4,7 +4,7 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#ffbf80",
+    backgroundColor: "#ffe6cc",
     textAlign: "center",
     justifyContent: "center",
   },
@@ -27,4 +27,5 @@ export default StyleSheet.create({
     alignItems: "center",
     margin: 20,
   },
+  weatherIcon: { width: 100, height: 100 },
 });
