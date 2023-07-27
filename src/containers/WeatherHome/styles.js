@@ -4,7 +4,7 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff2e6",
+    backgroundColor: "#ffbf80",
   },
   caption: {
     fontSize: 20,
@@ -18,6 +18,12 @@ export default StyleSheet.create({
     margin: 10,
     color: "#80002a",
     fontWeight: "700",
+  },
+  tempView: {
+    fontSize: 20,
+    margin: 10,
+    color: "#80002a",
+    fontWeight: "800",
   },
   weatherView: {
     justifyContent: "center",

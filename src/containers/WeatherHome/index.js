@@ -63,17 +63,6 @@ const WeatherHome = ({ navigation }) => {
     console.log("Current temp", foreCast.current.temp);
     return (
       <View style={styles.weatherView}>
-        {current && (
-          <>
-            <Text style={styles.textView}>
-              Current Temparature: {foreCast.current.temp} °C
-            </Text>
-            <Text style={styles.textView}>Weather: {current.main}</Text>
-            <Text style={styles.textView}>
-              Description: {current.description}
-            </Text>
-          </>
-        )}
         {imageUrl && (
           <Image
             style={{ width: 200, height: 200 }}
@@ -81,6 +70,15 @@ const WeatherHome = ({ navigation }) => {
               uri: imageUrl,
             }}
           />
+        )}
+        {current && (
+          <>
+            <Text style={styles.tempView}>{foreCast.current.temp} °C</Text>
+            <Text style={styles.textView}>{current.main}</Text>
+            <Text style={styles.textView}>
+              Description: {current.description}
+            </Text>
+          </>
         )}
       </View>
     );
