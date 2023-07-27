@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, Alert, ActivityIndicator } from "react-native";
+import { Text, View, Alert, ActivityIndicator, Image } from "react-native";
 import styles from "./styles";
 import { CustomButton } from "../../components";
 import { LocHelper } from "../../helpers";
 
 const WeatherHome = ({ navigation }) => {
-  const [userLoc, setUserLoc] = useState();
+  const [userLoc, setUserLoc] = useState(null);
   const [foreCast, setForeCast] = useState(null);
+  const [current, setCurrent] = useState();
+  const [imageUrl, setImageUrl] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
   const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
@@ -19,7 +21,6 @@ const WeatherHome = ({ navigation }) => {
           (loc) => {
             setUserLoc(loc);
             console.log("User Location", loc);
-            fetchForeCast();
           },
           (error) => {
             console.log(error);
@@ -33,28 +34,66 @@ const WeatherHome = ({ navigation }) => {
     );
   }, []);
 
+  useEffect(() => {
+    fetchForeCast();
+  }, [userLoc != null]);
+
   const fetchForeCast = async () => {
     setRefresh(true);
     weatherUrl = `${weatherUrl}&lat=${userLoc.latitude}&lon=${userLoc.longitude}`;
     const response = await fetch(weatherUrl);
     console.log("url", weatherUrl);
-    const data = await response.json();
-    console.log("forecast", data);
-    const current = data.current.weather[0];
-    console.log("Current weather", current);
     if (!response.ok) {
       Alert.alert("Error", "Something went wrong");
     } else {
+      const data = await response.json();
+      console.log("forecast", data);
       setForeCast(data);
+      setCurrent(data.current.weather[0]);
+      setImageUrl(
+        `http://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`
+      );
     }
     setIsLoading(false);
     setRefresh(false);
   };
 
+  const weatherData = () => {
+    console.log(imageUrl);
+    console.log("Current temp", foreCast.current.temp);
+    return (
+      <View style={styles.weatherView}>
+        {current && (
+          <>
+            <Text style={styles.textView}>
+              Current Temparature: {foreCast.current.temp} °C
+            </Text>
+            <Text style={styles.textView}>Weather: {current.main}</Text>
+            <Text style={styles.textView}>
+              Description: {current.description}
+            </Text>
+          </>
+        )}
+        {imageUrl && (
+          <Image
+            style={{ width: 200, height: 200 }}
+            source={{
+              uri: "http://openweathermap.org/img/wn/01n@4x.png",
+            }}
+          />
+        )}
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.caption}>Weather Home</Text>
-      {isLoading && <ActivityIndicator size="large" color="purple" />}
+      <Text style={styles.caption}>Weather On Your Location</Text>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="purple" />
+      ) : (
+        weatherData()
+      )}
       <CustomButton
         buttonText={"Go to Forecast"}
         handleClick={() => navigation.navigate("ForeCast", {})}
