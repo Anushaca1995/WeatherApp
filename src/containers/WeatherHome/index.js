@@ -1,35 +1,170 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import styles from './styles';
-import {CustomButton} from '../../components';
-import {LocHelper} from '../../helpers';
+import React, { useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  Alert,
+  ActivityIndicator,
+  Image,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import styles from "./styles";
+import { CustomButton } from "../../components";
+import { LocHelper } from "../../helpers";
 
-const WeatherHome = ({navigation}) => {
-  const [userLoc, setUserLoc] = useState();
+const WeatherHome = ({ navigation }) => {
+  const [userLoc, setUserLoc] = useState(null);
+  const [foreCast, setForeCast] = useState(null);
+  const [current, setCurrent] = useState();
+  const [imageUrl, setImageUrl] = useState();
+  const [isLoading, setIsLoading] = useState(true);
+  const [locSearch, setLocSearch] = useState("");
+  const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
+  let weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
+  let searchUrl = `https://api.openweathermap.org/geo/1.0/direct?exclude=minutely&units=metric&limit=5&appid=${weatherAPIKey}`;
+
   useEffect(() => {
     LocHelper.checkLocationPermission(
       () => {
         LocHelper.fetchUserLocation(
-          loc => {
+          (loc) => {
             setUserLoc(loc);
-            console.log(loc);
+            console.log("User Location", loc);
           },
-          error => {
+          (error) => {
             console.log(error);
-          },
+            Alert.alert("Oops", "Something went wrong");
+          }
         );
       },
-      err => {
+      (err) => {
         console.log(err);
-      },
+      }
     );
   }, []);
+
+  useEffect(() => {
+    fetchForeCast();
+  }, [userLoc?.latitude, userLoc?.longitude]);
+
+  const fetchLocSearch = async () => {
+    setIsLoading(true);
+    searchUrl = `${searchUrl}&q=${locSearch}`;
+    console.log("Search url", searchUrl);
+    const response = await fetch(searchUrl);
+    if (!response.ok) {
+      Alert.alert("Error", "Something went wrong in search");
+    } else {
+      const data = await response.json();
+      console.log("search url data", data);
+      Alert.alert(data[0].name);
+      setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
+    }
+    setIsLoading(false);
+  };
+
+  const fetchForeCast = async () => {
+    weatherUrl = `${weatherUrl}&lat=${userLoc.latitude}&lon=${userLoc.longitude}`;
+    const response = await fetch(weatherUrl);
+    console.log("url", weatherUrl);
+    if (!response.ok) {
+      Alert.alert("Error", "Something went wrong in fetching weather");
+    } else {
+      const data = await response.json();
+      console.log("forecast", data);
+      setForeCast(data);
+      setCurrent(data.current.weather[0]);
+      setImageUrl(
+        `https://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`
+      );
+    }
+    setIsLoading(false);
+  };
+
+  const weatherData = () => {
+    console.log(imageUrl);
+    return (
+      <View style={styles.weatherView}>
+        <TouchableOpacity onPress={fetchForeCast}>
+          <Image
+            style={{ width: 40, height: 40, borderRadius: 40 }}
+            source={{
+              uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
+            }}
+          />
+        </TouchableOpacity>
+        {imageUrl && (
+          <Image
+            style={{ width: 200, height: 200 }}
+            source={{
+              uri: imageUrl,
+            }}
+          />
+        )}
+        {current && (
+          <>
+            <Text style={styles.tempView}>{foreCast.current.temp} °C</Text>
+            <Text style={styles.textView}>{current.main}</Text>
+            <Text style={styles.textView}>
+              Description: {current.description}
+            </Text>
+          </>
+        )}
+      </View>
+    );
+  };
+
+  const handleSearchEnter = () => {
+    if (locSearch != "") {
+      fetchLocSearch();
+    } else {
+      Alert.alert("Empty Search", "Please enter location");
+    }
+  };
+
+  const renderSearch = () => {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+        }}
+      >
+        <TextInput
+          style={{
+            padding: 10,
+            backgroundColor: "#fff2e6",
+            margin: 10,
+            borderRadius: 10,
+            width: 300,
+          }}
+          onChangeText={(newText) => setLocSearch(newText)}
+          defaultValue={locSearch}
+          placeholder="Search Location .."
+        />
+        <TouchableOpacity
+          style={{ backgroundColor: "white", padding: 10, borderRadius: 10 }}
+          onPress={handleSearchEnter}
+        >
+          <Text>Enter</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.caption}>Weather Home</Text>
+      {renderSearch()}
+      <Text style={styles.caption}>Weather On Your Location</Text>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="purple" />
+      ) : (
+        weatherData()
+      )}
       <CustomButton
-        buttonText={'Go to Forecast'}
-        handleClick={() => navigation.navigate('ForeCast', {})}
+        buttonText={"Go to Forecast"}
+        handleClick={() => navigation.navigate("ForeCast", {})}
       />
     </View>
   );
