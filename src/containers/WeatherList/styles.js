@@ -33,4 +33,6 @@ export default StyleSheet.create({
   cellItem: { fontSize: 15, fontWeight: "bold", margin: 5 },
   desc: { fontSize: 15, margin: 5 },
   itemBorder: { backgroundColor: "#ff9999", height: 1 },
+  refresh: { width: 40, height: 40, borderRadius: 40 },
+  refreshView: { justifyContent: "center", alignItems: "center" },
 });

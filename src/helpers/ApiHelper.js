@@ -1,10 +1,10 @@
 import {
   kApiUrlEndpoint,
   ERROR_NETWORK_NOT_AVAILABLE,
-  ERROR_WRONG_CREDENTIALS,
   API_TIMEOUT,
 } from "../config/WebServices";
 import { create } from "apisauce";
+import utils from "../utils";
 
 const api = create({
   baseURL: kApiUrlEndpoint,
@@ -37,9 +37,14 @@ class ApiHelper {
   async postImage(url, data, headers) {}
 
   handlePromise = (resolve, reject, response) => {
-    if (response.error) {
-      if (response.error.code === "LOGIN_FAILED") {
-        reject(ERROR_WRONG_CREDENTIALS);
+    if (response.status == null) {
+      console.log(response.problem);
+      if (response.problem === "NETWORK_ERROR") {
+        utils.showAlertWithDelay(
+          ERROR_NETWORK_NOT_AVAILABLE.title,
+          ERROR_NETWORK_NOT_AVAILABLE.message
+        );
+        reject(ERROR_NETWORK_NOT_AVAILABLE);
       } else {
         reject(response.error);
       }

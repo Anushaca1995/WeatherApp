@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
-  Alert,
   ActivityIndicator,
   Image,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 import styles from "./styles";
 import { kWeatherForecast } from "../../config/WebServices";
@@ -37,7 +37,10 @@ const WeatherList = ({ navigation, route }) => {
     });
 
     if (!response.ok) {
-      utils.showAlertWithDelay("Error", "Something went wrong");
+      utils.showAlertWithDelay(
+        "Forecast Error",
+        "Something went wrong in forecast error"
+      );
     } else {
       const { data } = response;
 
@@ -85,22 +88,46 @@ const WeatherList = ({ navigation, route }) => {
 
   const renderWeatherList = () => {
     return (
-      <FlatList
-        data={weatherArr}
-        renderItem={renderCellItem}
-        scrollEnabled
-        ItemSeparatorComponent={renderItemSeperator}
-      />
+      <View>
+        <Text style={styles.caption}>Five Days ForeCast</Text>
+        <FlatList
+          data={weatherArr}
+          renderItem={renderCellItem}
+          scrollEnabled
+          ItemSeparatorComponent={renderItemSeperator}
+        />
+      </View>
     );
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.caption}>Five Days ForeCast</Text>
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#660022" />
+      {userLoc == undefined || weatherArr.length == 0 ? (
+        <View style={styles.refreshView}>
+          <Text style={styles.caption}> Oops something went wrong</Text>
+          <Text style={[styles.textView, { textAlign: "center" }]}>
+            Please try again by refreshing page
+          </Text>
+          <TouchableOpacity onPress={fetchForeCast}>
+            <Image
+              style={styles.refresh}
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
+              }}
+            />
+          </TouchableOpacity>
+        </View>
       ) : (
-        renderWeatherList()
+        <>
+          {isLoading ? (
+            <View>
+              <Text style={styles.caption}>Please Wait...</Text>
+              <ActivityIndicator size="large" color="#660022" />
+            </View>
+          ) : (
+            renderWeatherList()
+          )}
+        </>
       )}
     </View>
   );

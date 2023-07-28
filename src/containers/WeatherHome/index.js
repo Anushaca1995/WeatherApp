@@ -54,7 +54,10 @@ const WeatherHome = ({ navigation }) => {
           },
           (error) => {
             console.log(error);
-            utils.showAlertWithDelay("Oops", "Something went wrong");
+            utils.showAlertWithDelay(
+              "User Location Error",
+              "Something went wrong in getting user location"
+            );
           }
         );
       },
@@ -77,7 +80,10 @@ const WeatherHome = ({ navigation }) => {
     });
 
     if (!response.ok) {
-      utils.showAlertWithDelay("Error", "Something went wrong in search");
+      utils.showAlertWithDelay(
+        "Location Find Error",
+        "Something went wrong in location finder"
+      );
     } else {
       const { data } = response;
 
@@ -101,8 +107,8 @@ const WeatherHome = ({ navigation }) => {
 
     if (!response.ok) {
       utils.showAlertWithDelay(
-        "Error",
-        "Something went wrong in fetching weather"
+        "Current Weather Error",
+        "Something went wrong in fetching current weather"
       );
     } else {
       const { data } = response;
@@ -117,17 +123,8 @@ const WeatherHome = ({ navigation }) => {
   };
 
   const weatherData = () => {
-    console.log(imageUrl);
     return (
       <View style={styles.weatherView}>
-        <TouchableOpacity onPress={fetchForeCast}>
-          <Image
-            style={styles.refresh}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
-            }}
-          />
-        </TouchableOpacity>
         {imageUrl && (
           <Image
             style={styles.icon}
@@ -161,26 +158,36 @@ const WeatherHome = ({ navigation }) => {
 
   const renderSearch = () => {
     return (
-      <View style={styles.searchView}>
-        <TextInput
-          style={[styles.searchInput, { width: 0.6 * windowWidth }]}
-          onChangeText={(newText) => setLocSearch(newText)}
-          defaultValue={locSearch}
-          placeholder="Search Location .."
-        />
-        <TouchableOpacity onPress={checkLocPermission}>
+      <View style={styles.searchContainer}>
+        <View style={styles.searchView}>
+          <TextInput
+            style={[styles.searchInput, { width: 0.6 * windowWidth }]}
+            onChangeText={(newText) => setLocSearch(newText)}
+            defaultValue={locSearch}
+            placeholder="Search Location .."
+          />
+          <TouchableOpacity onPress={checkLocPermission}>
+            <Image
+              style={styles.yourLocIcon}
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/256/3711/3711245.png",
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.enterButton}
+            onPress={handleSearchEnter}
+          >
+            <Text style={{ color: "white", fontWeight: "700" }}>Enter</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={fetchForeCast}>
           <Image
-            style={styles.yourLocIcon}
+            style={styles.refresh}
             source={{
-              uri: "https://cdn-icons-png.flaticon.com/256/3711/3711245.png",
+              uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
             }}
           />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.enterButton}
-          onPress={handleSearchEnter}
-        >
-          <Text style={{ color: "white", fontWeight: "700" }}>Enter</Text>
         </TouchableOpacity>
       </View>
     );
@@ -189,7 +196,7 @@ const WeatherHome = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {renderSearch()}
-      {userLoc != undefined ? (
+      {userLoc != undefined && foreCast != null ? (
         <>
           <Text style={styles.caption}>Weather @ {locName}</Text>
           {isLoading ? (
@@ -207,11 +214,6 @@ const WeatherHome = ({ navigation }) => {
           style={{ justifyContent: "center", alignItems: "center", margin: 20 }}
         >
           <Text style={styles.caption}>Oops! Something Went Wrong</Text>
-          <Text style={styles.textView}>
-            Please try again with valid places
-          </Text>
-          <Text style={styles.textView}>Or</Text>
-          <Text style={styles.textView}>Choose your own location</Text>
         </View>
       )}
     </View>
