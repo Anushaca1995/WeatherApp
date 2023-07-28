@@ -53,8 +53,8 @@ const WeatherList = ({ navigation, route }) => {
   const renderCellItem = ({ item, index }) => {
     const dateTime = item.dt_txt;
     const date = new Date(dateTime);
-    const dateonly = date.toLocaleDateString("en-GB");
-    const timeonly = dateTime.substring(11, 19);
+    const dateonly = date.toLocaleDateString("en-GB").substring(0, 5);
+    const timeonly = dateTime.substring(11, 16);
     const dayName = days[date.getDay()];
     return (
       <View style={styles.weatherView}>
@@ -75,7 +75,6 @@ const WeatherList = ({ navigation, route }) => {
           <View>
             <Text style={styles.cellCap}>{item.main.temp} °C</Text>
             <Text style={styles.cellItem}>{item.weather[0].main}</Text>
-            <Text style={styles.desc}>{item.weather[0].description}</Text>
           </View>
         </View>
       </View>

@@ -40,10 +40,11 @@ export default StyleSheet.create({
   },
   searchInput: {
     padding: 10,
-    backgroundColor: "#fff2e6",
+    backgroundColor: "#ffccb3",
     margin: 10,
     borderRadius: 10,
     width: 250,
+    color: "black",
   },
   yourLocIcon: {
     margin: 10,
