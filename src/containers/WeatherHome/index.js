@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  ScrollView,
 } from "react-native";
 import styles from "./styles";
 import { CustomButton } from "../../components";
@@ -222,7 +223,7 @@ const WeatherHome = ({ navigation }) => {
 
   const renderLocList = () => {
     return (
-      <View>
+      <View style={{ margin: 20 }}>
         <Text style={styles.caption}>Saved Locations</Text>
         <FlatList
           data={locArray}
@@ -271,7 +272,7 @@ const WeatherHome = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {renderSearch()}
       {userLoc != undefined && foreCast != null ? (
         <>
@@ -296,7 +297,7 @@ const WeatherHome = ({ navigation }) => {
           <Text style={styles.caption}>No record found</Text>
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 };
 

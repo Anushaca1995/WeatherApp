@@ -60,4 +60,6 @@ export default StyleSheet.create({
   },
   searchContainer: { justifyContent: "center", alignItems: "center" },
   itemBorder: { backgroundColor: "#ff9999", height: 1 },
+  cellCap: { fontSize: 20, fontWeight: "bold", margin: 5, color: "black" },
+  cellItem: { fontSize: 15, fontWeight: "bold", margin: 5, color: "black" },
 });
