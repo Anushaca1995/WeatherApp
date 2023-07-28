@@ -12,12 +12,9 @@ import styles from "./styles";
 import { CustomButton } from "../../components";
 import { LocHelper, ApiHelper } from "../../helpers";
 import { weatherAPIKey } from "../../config/AppConfig";
-import {
-  kSearchWeather,
-  kCurrentWeatherUrl,
-  kApiUrlEndpoint,
-} from "../../config/WebServices";
+import { kSearchWeather, kCurrentWeatherUrl } from "../../config/WebServices";
 import utils from "../../utils";
+import { Dimensions } from "react-native";
 
 const WeatherHome = ({ navigation }) => {
   const [userLoc, setUserLoc] = useState(null);
@@ -27,6 +24,7 @@ const WeatherHome = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [locSearch, setLocSearch] = useState("");
   const [locName, setLocName] = useState();
+  const windowWidth = Dimensions.get("window").width;
 
   let searchObject = {
     exclude: "minutely",
@@ -165,7 +163,7 @@ const WeatherHome = ({ navigation }) => {
     return (
       <View style={styles.searchView}>
         <TextInput
-          style={styles.searchInput}
+          style={[styles.searchInput, { width: 0.6 * windowWidth }]}
           onChangeText={(newText) => setLocSearch(newText)}
           defaultValue={locSearch}
           placeholder="Search Location .."
