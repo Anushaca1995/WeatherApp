@@ -10,7 +10,14 @@ import {
 } from "react-native";
 import styles from "./styles";
 import { CustomButton } from "../../components";
-import { LocHelper } from "../../helpers";
+import { LocHelper, ApiHelper } from "../../helpers";
+import { weatherAPIKey } from "../../config/AppConfig";
+import {
+  kSearchWeather,
+  kCurrentWeatherUrl,
+  kApiUrlEndpoint,
+} from "../../config/WebServices";
+import utils from "../../utils";
 
 const WeatherHome = ({ navigation }) => {
   const [userLoc, setUserLoc] = useState(null);
@@ -20,9 +27,19 @@ const WeatherHome = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [locSearch, setLocSearch] = useState("");
   const [locName, setLocName] = useState();
-  const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
-  let weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
-  let searchUrl = `https://api.openweathermap.org/geo/1.0/direct?exclude=minutely&units=metric&limit=5&appid=${weatherAPIKey}`;
+
+  let searchObject = {
+    exclude: "minutely",
+    units: "metric",
+    limit: 5,
+    appid: weatherAPIKey,
+  };
+
+  let currentWeatherObject = {
+    exclude: "minutely",
+    units: "metric",
+    appid: weatherAPIKey,
+  };
 
   useEffect(() => {
     checkLocPermission();
@@ -39,7 +56,7 @@ const WeatherHome = ({ navigation }) => {
           },
           (error) => {
             console.log(error);
-            Alert.alert("Oops", "Something went wrong");
+            utils.showAlertWithDelay("Oops", "Something went wrong");
           }
         );
       },
@@ -55,28 +72,41 @@ const WeatherHome = ({ navigation }) => {
 
   const fetchLocSearch = async () => {
     setIsLoading(true);
-    searchUrl = `${searchUrl}&q=${locSearch}`;
-    console.log("Search url", searchUrl);
-    const response = await fetch(searchUrl);
+
+    const response = await ApiHelper.get(kSearchWeather, {
+      ...searchObject,
+      q: locSearch,
+    });
+
     if (!response.ok) {
-      Alert.alert("Error", "Something went wrong in search");
+      utils.showAlertWithDelay("Error", "Something went wrong in search");
     } else {
-      const data = await response.json();
-      console.log("search url data", data);
-      setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
+      const { data } = response;
+
+      if (data && data.length > 0) {
+        setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
+      } else {
+        setUserLoc(undefined);
+      }
     }
     setIsLoading(false);
   };
 
   const fetchForeCast = async () => {
-    weatherUrl = `${weatherUrl}&lat=${userLoc.latitude}&lon=${userLoc.longitude}`;
-    const response = await fetch(weatherUrl);
-    console.log("url", weatherUrl);
+    const response = await ApiHelper.get(kCurrentWeatherUrl, {
+      ...currentWeatherObject,
+      lat: userLoc.latitude,
+      lon: userLoc.longitude,
+    });
+
     if (!response.ok) {
-      Alert.alert("Error", "Something went wrong in fetching weather");
+      utils.showAlertWithDelay(
+        "Error",
+        "Something went wrong in fetching weather"
+      );
     } else {
-      const data = await response.json();
-      console.log("forecast", data);
+      const { data } = response;
+
       setForeCast(data);
       setCurrent(data.current.weather[0]);
       setImageUrl(
@@ -125,7 +155,7 @@ const WeatherHome = ({ navigation }) => {
       setLocName(locSearch);
       setLocSearch("");
     } else {
-      Alert.alert("Empty Search", "Please enter location");
+      utils.showAlertWithDelay("Empty Search", "Please enter location");
     }
   };
 

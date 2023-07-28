@@ -8,28 +8,41 @@ import {
   FlatList,
 } from "react-native";
 import styles from "./styles";
+import { kWeatherForecast } from "../../config/WebServices";
+import { weatherAPIKey } from "../../config/AppConfig";
+import { ApiHelper } from "../../helpers";
+import utils from "../../utils";
 
 const WeatherList = ({ navigation, route }) => {
   const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
   const { userLoc } = route.params;
   const [weatherArr, SetWeatherArr] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
+
   let foreCastUrl = `https://api.openweathermap.org/data/2.5/forecast?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
+
+  const forecastObject = {
+    exclude: "minutely",
+    units: "metric",
+    appid: weatherAPIKey,
+  };
 
   useEffect(() => {
     fetchForeCast();
   }, [userLoc != null]);
 
   const fetchForeCast = async () => {
-    foreCastUrl = `${foreCastUrl}&lat=${userLoc.latitude}&lon=${userLoc.longitude}`;
-    const response = await fetch(foreCastUrl);
-    console.log("url", foreCastUrl);
+    const response = await ApiHelper.get(kWeatherForecast, {
+      ...forecastObject,
+      lat: userLoc.latitude,
+      lon: userLoc.longitude,
+    });
+
     if (!response.ok) {
-      Alert.alert("Error", "Something went wrong");
+      utils.showAlertWithDelay("Error", "Something went wrong");
     } else {
-      const data = await response.json();
-      console.log("forecast", data);
+      const { data } = response;
+
       SetWeatherArr(data.list);
     }
     setIsLoading(false);

@@ -1,3 +1,4 @@
-import LocHelper from './LocHelper';
+import LocHelper from "./LocHelper";
+import ApiHelper from "./ApiHelper";
 
-export {LocHelper};
+export { LocHelper, ApiHelper };
