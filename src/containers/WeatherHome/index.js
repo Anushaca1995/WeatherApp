@@ -22,7 +22,7 @@ import utils from "../../utils";
 const WeatherHome = ({ navigation }) => {
   const [userLoc, setUserLoc] = useState(null);
   const [foreCast, setForeCast] = useState(null);
-  const [current, setCurrent] = useState();
+  const [currentWeather, setCurrentWeather] = useState();
   const [imageUrl, setImageUrl] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [locSearch, setLocSearch] = useState("");
@@ -87,6 +87,8 @@ const WeatherHome = ({ navigation }) => {
         setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
       } else {
         setUserLoc(undefined);
+        setForeCast(null);
+        setCurrentWeather(null);
       }
     }
     setIsLoading(false);
@@ -108,7 +110,7 @@ const WeatherHome = ({ navigation }) => {
       const { data } = response;
 
       setForeCast(data);
-      setCurrent(data.current.weather[0]);
+      setCurrentWeather(data.current.weather[0]);
       setImageUrl(
         `https://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`
       );
@@ -136,12 +138,12 @@ const WeatherHome = ({ navigation }) => {
             }}
           />
         )}
-        {current && (
+        {currentWeather && (
           <>
             <Text style={styles.tempView}>{foreCast.current.temp} °C</Text>
-            <Text style={styles.textView}>{current.main}</Text>
+            <Text style={styles.textView}>{currentWeather.main}</Text>
             <Text style={styles.textView}>
-              Description: {current.description}
+              Description: {currentWeather.description}
             </Text>
           </>
         )}
@@ -189,16 +191,31 @@ const WeatherHome = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {renderSearch()}
-      <Text style={styles.caption}>Weather @ {locName}</Text>
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#660022" />
+      {userLoc != undefined ? (
+        <>
+          <Text style={styles.caption}>Weather @ {locName}</Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#660022" />
+          ) : (
+            weatherData()
+          )}
+          <CustomButton
+            buttonText={"Go to Forecast"}
+            handleClick={() => navigation.navigate("ForeCast", { userLoc })}
+          />
+        </>
       ) : (
-        weatherData()
+        <View
+          style={{ justifyContent: "center", alignItems: "center", margin: 20 }}
+        >
+          <Text style={styles.caption}>Oops! Something Went Wrong</Text>
+          <Text style={styles.textView}>
+            Please try again with valid places
+          </Text>
+          <Text style={styles.textView}>Or</Text>
+          <Text style={styles.textView}>Choose your own location</Text>
+        </View>
       )}
-      <CustomButton
-        buttonText={"Go to Forecast"}
-        handleClick={() => navigation.navigate("ForeCast", { userLoc })}
-      />
     </View>
   );
 };

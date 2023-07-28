@@ -19,8 +19,6 @@ const WeatherList = ({ navigation, route }) => {
   const [weatherArr, SetWeatherArr] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  let foreCastUrl = `https://api.openweathermap.org/data/2.5/forecast?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
-
   const forecastObject = {
     exclude: "minutely",
     units: "metric",
