@@ -12,6 +12,7 @@ export default StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     color: "#80002a",
+    marginTop: 20,
   },
   textView: {
     fontSize: 15,
@@ -28,7 +29,7 @@ export default StyleSheet.create({
   weatherView: {
     justifyContent: "center",
     alignItems: "center",
-    margin: 20,
+    margin: 10,
   },
   refresh: { width: 40, height: 40, borderRadius: 40 },
   icon: { width: 200, height: 200 },
@@ -39,10 +40,11 @@ export default StyleSheet.create({
   },
   searchInput: {
     padding: 10,
-    backgroundColor: "#fff2e6",
+    backgroundColor: "#ffccb3",
     margin: 10,
     borderRadius: 10,
     width: 250,
+    color: "black",
   },
   yourLocIcon: {
     margin: 10,
@@ -56,4 +58,6 @@ export default StyleSheet.create({
     borderRadius: 10,
     margin: 10,
   },
+  searchContainer: { justifyContent: "center", alignItems: "center" },
+  itemBorder: { backgroundColor: "#ff9999", height: 1 },
 });

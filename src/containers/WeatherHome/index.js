@@ -2,31 +2,81 @@ import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
-  Alert,
   ActivityIndicator,
   Image,
   TextInput,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import styles from "./styles";
 import { CustomButton } from "../../components";
-import { LocHelper } from "../../helpers";
+import { LocHelper, ApiHelper } from "../../helpers";
+import { weatherAPIKey } from "../../config/AppConfig";
+import { kSearchWeather, kCurrentWeatherUrl } from "../../config/WebServices";
+import utils from "../../utils";
+import { Dimensions } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const WeatherHome = ({ navigation }) => {
   const [userLoc, setUserLoc] = useState(null);
   const [foreCast, setForeCast] = useState(null);
-  const [current, setCurrent] = useState();
+  const [currentWeather, setCurrentWeather] = useState();
   const [imageUrl, setImageUrl] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const [locSearch, setLocSearch] = useState("");
   const [locName, setLocName] = useState();
-  const weatherAPIKey = "6a0255bff2f1816296816573eb6f389f";
-  let weatherUrl = `https://api.openweathermap.org/data/3.0/onecall?exclude=minutely&units=metric&appid=${weatherAPIKey}`;
-  let searchUrl = `https://api.openweathermap.org/geo/1.0/direct?exclude=minutely&units=metric&limit=5&appid=${weatherAPIKey}`;
+  const [locArray, setLocArray] = useState([]);
+  const windowWidth = Dimensions.get("window").width;
+
+  let searchObject = {
+    exclude: "minutely",
+    units: "metric",
+    limit: 5,
+    appid: weatherAPIKey,
+  };
+
+  let currentWeatherObject = {
+    exclude: "minutely",
+    units: "metric",
+    appid: weatherAPIKey,
+  };
 
   useEffect(() => {
     checkLocPermission();
+    retrieveData();
   }, []);
+
+  const retrieveData = async () => {
+    const retrievedArray = await getArray("locArray");
+    console.log("retrieved Array:", retrievedArray);
+    setLocArray(retrievedArray);
+  };
+
+  const storeArray = async (key, array) => {
+    try {
+      const jsonValue = JSON.stringify(array);
+      await AsyncStorage.setItem(key, jsonValue);
+    } catch (e) {
+      console.error("Error storing array in AsyncStorage:", e);
+    }
+  };
+
+  const getArray = async (key) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      console.error("Error retrieving array from AsyncStorage:", e);
+      return null;
+    }
+  };
+
+  const saveData = async () => {
+    if (!locArray.includes(locSearch)) {
+      await storeArray("locArray", locArray);
+      console.log("Array saved to AsyncStorage.");
+    }
+  };
 
   const checkLocPermission = () => {
     LocHelper.checkLocationPermission(
@@ -39,7 +89,10 @@ const WeatherHome = ({ navigation }) => {
           },
           (error) => {
             console.log(error);
-            Alert.alert("Oops", "Something went wrong");
+            utils.showAlertWithDelay(
+              "User Location Error",
+              "Something went wrong in getting user location"
+            );
           }
         );
       },
@@ -55,30 +108,58 @@ const WeatherHome = ({ navigation }) => {
 
   const fetchLocSearch = async () => {
     setIsLoading(true);
-    searchUrl = `${searchUrl}&q=${locSearch}`;
-    console.log("Search url", searchUrl);
-    const response = await fetch(searchUrl);
+
+    const response = await ApiHelper.get(kSearchWeather, {
+      ...searchObject,
+      q: locSearch,
+    });
+
     if (!response.ok) {
-      Alert.alert("Error", "Something went wrong in search");
+      utils.showAlertWithDelay(
+        "Location Find Error",
+        "Something went wrong in location finder"
+      );
     } else {
-      const data = await response.json();
-      console.log("search url data", data);
-      setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
+      const { data } = response;
+      if (data && data.length > 0) {
+        setLocName(locSearch);
+        console.log(locArray);
+        if (locArray != null) {
+          if (!locArray.includes(locSearch)) {
+            setLocArray([...locArray, locSearch]);
+            saveData();
+          }
+        } else {
+          setLocArray([locSearch]);
+          saveData();
+        }
+        setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
+      } else {
+        setUserLoc(undefined);
+        setForeCast(null);
+        setCurrentWeather(null);
+      }
     }
     setIsLoading(false);
   };
 
   const fetchForeCast = async () => {
-    weatherUrl = `${weatherUrl}&lat=${userLoc.latitude}&lon=${userLoc.longitude}`;
-    const response = await fetch(weatherUrl);
-    console.log("url", weatherUrl);
+    const response = await ApiHelper.get(kCurrentWeatherUrl, {
+      ...currentWeatherObject,
+      lat: userLoc.latitude,
+      lon: userLoc.longitude,
+    });
+
     if (!response.ok) {
-      Alert.alert("Error", "Something went wrong in fetching weather");
+      utils.showAlertWithDelay(
+        "Current Weather Error",
+        "Something went wrong in fetching current weather"
+      );
     } else {
-      const data = await response.json();
-      console.log("forecast", data);
+      const { data } = response;
+
       setForeCast(data);
-      setCurrent(data.current.weather[0]);
+      setCurrentWeather(data.current.weather[0]);
       setImageUrl(
         `https://openweathermap.org/img/wn/${data.current.weather[0].icon}@4x.png`
       );
@@ -87,17 +168,8 @@ const WeatherHome = ({ navigation }) => {
   };
 
   const weatherData = () => {
-    console.log(imageUrl);
     return (
       <View style={styles.weatherView}>
-        <TouchableOpacity onPress={fetchForeCast}>
-          <Image
-            style={styles.refresh}
-            source={{
-              uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
-            }}
-          />
-        </TouchableOpacity>
         {imageUrl && (
           <Image
             style={styles.icon}
@@ -106,12 +178,12 @@ const WeatherHome = ({ navigation }) => {
             }}
           />
         )}
-        {current && (
+        {currentWeather && (
           <>
             <Text style={styles.tempView}>{foreCast.current.temp} °C</Text>
-            <Text style={styles.textView}>{current.main}</Text>
+            <Text style={styles.textView}>{currentWeather.main}</Text>
             <Text style={styles.textView}>
-              Description: {current.description}
+              Description: {currentWeather.description}
             </Text>
           </>
         )}
@@ -122,35 +194,77 @@ const WeatherHome = ({ navigation }) => {
   const handleSearchEnter = () => {
     if (locSearch != "") {
       fetchLocSearch();
-      setLocName(locSearch);
       setLocSearch("");
     } else {
-      Alert.alert("Empty Search", "Please enter location");
+      utils.showAlertWithDelay("Empty Search", "Please enter location");
     }
   };
 
+  const renderCellItem = ({ item, index }) => {
+    return (
+      <View
+        style={{ justifyContent: "center", alignItems: "center", padding: 10 }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            setLocSearch(item);
+          }}
+        >
+          <Text style={styles.cellCap}>{item}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderItemSeperator = () => {
+    return <View style={styles.itemBorder}></View>;
+  };
+
+  const renderLocList = () => {
+    return (
+      <View>
+        <Text style={styles.caption}>Saved Locations</Text>
+        <FlatList
+          data={locArray}
+          renderItem={renderCellItem}
+          scrollEnabled
+          ItemSeparatorComponent={renderItemSeperator}
+        />
+      </View>
+    );
+  };
   const renderSearch = () => {
     return (
-      <View style={styles.searchView}>
-        <TextInput
-          style={styles.searchInput}
-          onChangeText={(newText) => setLocSearch(newText)}
-          defaultValue={locSearch}
-          placeholder="Search Location .."
-        />
-        <TouchableOpacity onPress={checkLocPermission}>
+      <View style={styles.searchContainer}>
+        <View style={styles.searchView}>
+          <TextInput
+            style={[styles.searchInput, { width: 0.6 * windowWidth }]}
+            onChangeText={(newText) => setLocSearch(newText)}
+            defaultValue={locSearch}
+            placeholder="Search Location .."
+          />
+          <TouchableOpacity onPress={checkLocPermission}>
+            <Image
+              style={styles.yourLocIcon}
+              source={{
+                uri: "https://cdn-icons-png.flaticon.com/256/3711/3711245.png",
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.enterButton}
+            onPress={handleSearchEnter}
+          >
+            <Text style={{ color: "white", fontWeight: "700" }}>Enter</Text>
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={fetchForeCast}>
           <Image
-            style={styles.yourLocIcon}
+            style={styles.refresh}
             source={{
-              uri: "https://cdn-icons-png.flaticon.com/256/3711/3711245.png",
+              uri: "https://cdn-icons-png.flaticon.com/512/3318/3318364.png",
             }}
           />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.enterButton}
-          onPress={handleSearchEnter}
-        >
-          <Text style={{ color: "white", fontWeight: "700" }}>Enter</Text>
         </TouchableOpacity>
       </View>
     );
@@ -159,16 +273,29 @@ const WeatherHome = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {renderSearch()}
-      <Text style={styles.caption}>Weather @ {locName}</Text>
-      {isLoading ? (
+      {userLoc != undefined && foreCast != null ? (
+        <>
+          <Text style={styles.caption}>Weather @ {locName}</Text>
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#660022" />
+          ) : (
+            weatherData()
+          )}
+          <CustomButton
+            buttonText={"Go to Forecast"}
+            handleClick={() => navigation.navigate("ForeCast", { userLoc })}
+          />
+          {locArray != null && renderLocList()}
+        </>
+      ) : isLoading ? (
         <ActivityIndicator size="large" color="#660022" />
       ) : (
-        weatherData()
+        <View
+          style={{ justifyContent: "center", alignItems: "center", margin: 20 }}
+        >
+          <Text style={styles.caption}>No record found</Text>
+        </View>
       )}
-      <CustomButton
-        buttonText={"Go to Forecast"}
-        handleClick={() => navigation.navigate("ForeCast", { userLoc })}
-      />
     </View>
   );
 };
