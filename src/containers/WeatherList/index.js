@@ -10,6 +10,7 @@ import {
 import styles from "./styles";
 
 const WeatherList = ({ navigation, route }) => {
+  const days = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
   const { userLoc } = route.params;
   const [weatherArr, SetWeatherArr] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,29 +37,49 @@ const WeatherList = ({ navigation, route }) => {
   };
 
   const renderCellItem = ({ item, index }) => {
+    const dateTime = item.dt_txt;
+    const date = new Date(dateTime);
+    const dateonly = date.toLocaleDateString("en-GB");
+    const timeonly = dateTime.substring(11, 19);
+    const dayName = days[date.getDay()];
     return (
       <View style={styles.weatherView}>
-        <View>
-          <Image
-            style={styles.weatherIcon}
-            source={{
-              uri: `https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`,
-            }}
-          />
-        </View>
-        <View>
-          <Text>{item.dt_txt}</Text>
-          <Text>{item.main.temp} °C</Text>
-          <Text>{item.weather[0].main}</Text>
-          <Text>{item.weather[0].description}</Text>
+        <View style={styles.cellView}>
+          <View>
+            <Text style={styles.cellCap}>{dayName}</Text>
+            <Text style={styles.cellItem}>{dateonly}</Text>
+            <Text style={styles.cellItem}>{timeonly}</Text>
+          </View>
+          <View>
+            <Image
+              style={styles.weatherIcon}
+              source={{
+                uri: `https://openweathermap.org/img/wn/${item.weather[0].icon}@4x.png`,
+              }}
+            />
+          </View>
+          <View>
+            <Text style={styles.cellCap}>{item.main.temp} °C</Text>
+            <Text style={styles.cellItem}>{item.weather[0].main}</Text>
+            <Text style={styles.desc}>{item.weather[0].description}</Text>
+          </View>
         </View>
       </View>
     );
   };
 
+  const renderItemSeperator = () => {
+    return <View style={styles.itemBorder}></View>;
+  };
+
   const renderWeatherList = () => {
     return (
-      <FlatList data={weatherArr} renderItem={renderCellItem} scrollEnabled />
+      <FlatList
+        data={weatherArr}
+        renderItem={renderCellItem}
+        scrollEnabled
+        ItemSeparatorComponent={renderItemSeperator}
+      />
     );
   };
 

@@ -10,7 +10,7 @@ export default StyleSheet.create({
   },
   caption: {
     fontSize: 20,
-    padding: 5,
+    padding: 10,
     fontWeight: "bold",
     textAlign: "center",
     color: "#80002a",
@@ -25,7 +25,12 @@ export default StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    margin: 20,
+    margin: 10,
   },
-  weatherIcon: { width: 100, height: 100 },
+  weatherIcon: { width: 130, height: 130, top: 0 },
+  cellView: { padding: 10, flexDirection: "row" },
+  cellCap: { fontSize: 20, fontWeight: "bold", margin: 5 },
+  cellItem: { fontSize: 15, fontWeight: "bold", margin: 5 },
+  desc: { fontSize: 15, margin: 5 },
+  itemBorder: { backgroundColor: "#ff9999", height: 1 },
 });
