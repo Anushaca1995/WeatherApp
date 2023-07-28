@@ -1,8 +1,8 @@
 # Weather App
 
-My weather app have two screen
+<h1> My weather app have two screen </h1>
 
-&nbsp; &nbsp;1. Weather Screen
+&nbsp; &nbsp;<h2>1. Weather Screen</h2>
 
 &nbsp; &nbsp; &nbsp;     1. Application ask permission for tracking user location. Once user accepts request, it will show current weather of your location.
 
@@ -12,9 +12,13 @@ My weather app have two screen
 
 &nbsp; &nbsp; &nbsp;     4. We have refresh button to get the updated weather.
 
-&nbsp; &nbsp;2. 5 Day Forecast screen - Once we click on 'Go to Forecast', app moves to second screen. Here we can see 5 days forecast with 3 hour interval of times, which is a scrollable flatslist with weather data. If any slow or network issues are there, it will show a text  like 'Oops something went wrong' and refresh button. If your network stable, you can see foreacast details by click on refresh button.
 
-&nbsp;&nbsp;3. Every error responses are handled properly.
+&nbsp; &nbsp;<h2>2. 5 Day Forecast screen</h2> 
+
+&nbsp; &nbsp; &nbsp;     Once we click on 'Go to Forecast', app moves to second screen. Here we can see 5 days forecast with 3 hour interval of times, which is a scrollable flatslist with weather data. If any slow or network issues are there, it will show a text  like 'Oops something went wrong' and refresh button. If your network stable, you can see foreacast details by click on refresh button.
+
+
+&nbsp;&nbsp;<h2>3. Every error responses are handled properly</h2>
 
 
    
