@@ -6,6 +6,7 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import styles from "./styles";
 import { CustomButton } from "../../components";
@@ -14,6 +15,7 @@ import { weatherAPIKey } from "../../config/AppConfig";
 import { kSearchWeather, kCurrentWeatherUrl } from "../../config/WebServices";
 import utils from "../../utils";
 import { Dimensions } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const WeatherHome = ({ navigation }) => {
   const [userLoc, setUserLoc] = useState(null);
@@ -23,6 +25,7 @@ const WeatherHome = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [locSearch, setLocSearch] = useState("");
   const [locName, setLocName] = useState();
+  const [locArray, setLocArray] = useState([]);
   const windowWidth = Dimensions.get("window").width;
 
   let searchObject = {
@@ -40,7 +43,40 @@ const WeatherHome = ({ navigation }) => {
 
   useEffect(() => {
     checkLocPermission();
+    retrieveData();
   }, []);
+
+  const retrieveData = async () => {
+    const retrievedArray = await getArray("locArray");
+    console.log("retrieved Array:", retrievedArray);
+    setLocArray(retrievedArray);
+  };
+
+  const storeArray = async (key, array) => {
+    try {
+      const jsonValue = JSON.stringify(array);
+      await AsyncStorage.setItem(key, jsonValue);
+    } catch (e) {
+      console.error("Error storing array in AsyncStorage:", e);
+    }
+  };
+
+  const getArray = async (key) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key);
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      console.error("Error retrieving array from AsyncStorage:", e);
+      return null;
+    }
+  };
+
+  const saveData = async () => {
+    if (!locArray.includes(locSearch)) {
+      await storeArray("locArray", locArray);
+      console.log("Array saved to AsyncStorage.");
+    }
+  };
 
   const checkLocPermission = () => {
     LocHelper.checkLocationPermission(
@@ -85,8 +121,18 @@ const WeatherHome = ({ navigation }) => {
       );
     } else {
       const { data } = response;
-
       if (data && data.length > 0) {
+        setLocName(locSearch);
+        console.log(locArray);
+        if (locArray != null) {
+          if (!locArray.includes(locSearch)) {
+            setLocArray([...locArray, locSearch]);
+            saveData();
+          }
+        } else {
+          setLocArray([locSearch]);
+          saveData();
+        }
         setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
       } else {
         setUserLoc(undefined);
@@ -148,13 +194,45 @@ const WeatherHome = ({ navigation }) => {
   const handleSearchEnter = () => {
     if (locSearch != "") {
       fetchLocSearch();
-      setLocName(locSearch);
       setLocSearch("");
     } else {
       utils.showAlertWithDelay("Empty Search", "Please enter location");
     }
   };
 
+  const renderCellItem = ({ item, index }) => {
+    return (
+      <View
+        style={{ justifyContent: "center", alignItems: "center", padding: 10 }}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            setLocSearch(item);
+          }}
+        >
+          <Text style={styles.cellCap}>{item}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderItemSeperator = () => {
+    return <View style={styles.itemBorder}></View>;
+  };
+
+  const renderLocList = () => {
+    return (
+      <View>
+        <Text style={styles.caption}>Saved Locations</Text>
+        <FlatList
+          data={locArray}
+          renderItem={renderCellItem}
+          scrollEnabled
+          ItemSeparatorComponent={renderItemSeperator}
+        />
+      </View>
+    );
+  };
   const renderSearch = () => {
     return (
       <View style={styles.searchContainer}>
@@ -207,12 +285,15 @@ const WeatherHome = ({ navigation }) => {
             buttonText={"Go to Forecast"}
             handleClick={() => navigation.navigate("ForeCast", { userLoc })}
           />
+          {locArray != null && renderLocList()}
         </>
+      ) : isLoading ? (
+        <ActivityIndicator size="large" color="#660022" />
       ) : (
         <View
           style={{ justifyContent: "center", alignItems: "center", margin: 20 }}
         >
-          <Text style={styles.caption}>Oops! Something Went Wrong</Text>
+          <Text style={styles.caption}>No record found</Text>
         </View>
       )}
     </View>

@@ -59,4 +59,5 @@ export default StyleSheet.create({
     margin: 10,
   },
   searchContainer: { justifyContent: "center", alignItems: "center" },
+  itemBorder: { backgroundColor: "#ff9999", height: 1 },
 });
