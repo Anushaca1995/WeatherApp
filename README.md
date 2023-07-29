@@ -21,7 +21,7 @@
 &nbsp;&nbsp;<h4>3. Every error responses are handled properly.</h4>
 
 
-&nbsp;&nbsp;<h4>3. Every error responses are handled properly.</h4>
+&nbsp;&nbsp;<h4>3. Added react navigation and app icons for both ios and android.</h4>
 
 
 
