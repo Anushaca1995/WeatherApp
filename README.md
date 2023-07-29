@@ -24,6 +24,9 @@
 &nbsp;&nbsp;<h4>3. Added react navigation and app icons for both ios and android.</h4>
 
 
+&nbsp;&nbsp;<h4>3. Added API helpers and location helper for maitaining code quality and reusability</h4>
+
+
 
    
 
