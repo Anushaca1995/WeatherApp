@@ -18,7 +18,11 @@
 &nbsp; &nbsp; &nbsp;     Once we click on 'Go to Forecast', app moves to second screen. Here we can see 5 days forecast with 3 hour interval of times, which is a scrollable flatslist with weather data. If any slow or network issues are there, it will show a text  like 'Oops something went wrong' and refresh button. If your network stable, you can see foreacast details by click on refresh button.
 
 
-&nbsp;&nbsp;<h4>3. Every error responses are handled properly</h4>
+&nbsp;&nbsp;<h4>3. Every error responses are handled properly.</h4>
+
+
+&nbsp;&nbsp;<h4>3. Every error responses are handled properly.</h4>
+
 
 
    
