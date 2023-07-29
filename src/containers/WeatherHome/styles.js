@@ -62,4 +62,6 @@ export default StyleSheet.create({
   itemBorder: { backgroundColor: "#ff9999", height: 1 },
   cellCap: { fontSize: 20, fontWeight: "bold", margin: 5, color: "black" },
   cellItem: { fontSize: 15, fontWeight: "bold", margin: 5, color: "black" },
+  cellView: { justifyContent: "center", alignItems: "center", padding: 10 },
+  noRecord: { justifyContent: "center", alignItems: "center", margin: 20 },
 });

@@ -27,6 +27,7 @@ const WeatherHome = ({ navigation }) => {
   const [locSearch, setLocSearch] = useState("");
   const [locName, setLocName] = useState();
   const [locArray, setLocArray] = useState([]);
+  const [refreshAsync, setRefreshAsync] = useState(false);
   const windowWidth = Dimensions.get("window").width;
 
   let searchObject = {
@@ -46,6 +47,11 @@ const WeatherHome = ({ navigation }) => {
     checkLocPermission();
     retrieveData();
   }, []);
+
+  useEffect(() => {
+    saveData();
+    setRefreshAsync(false);
+  }, [locArray, refreshAsync]);
 
   const retrieveData = async () => {
     const retrievedArray = await getArray("locArray");
@@ -128,10 +134,12 @@ const WeatherHome = ({ navigation }) => {
         if (locArray != null) {
           if (!locArray.includes(locSearch)) {
             setLocArray([...locArray, locSearch]);
+            setRefreshAsync(true);
             saveData();
           }
         } else {
           setLocArray([locSearch]);
+          setRefreshAsync(true);
           saveData();
         }
         setUserLoc({ latitude: data[0].lat, longitude: data[0].lon });
@@ -203,9 +211,7 @@ const WeatherHome = ({ navigation }) => {
 
   const renderCellItem = ({ item, index }) => {
     return (
-      <View
-        style={{ justifyContent: "center", alignItems: "center", padding: 10 }}
-      >
+      <View style={styles.cellView}>
         <TouchableOpacity
           onPress={() => {
             setLocSearch(item);
@@ -291,9 +297,7 @@ const WeatherHome = ({ navigation }) => {
       ) : isLoading ? (
         <ActivityIndicator size="large" color="#660022" />
       ) : (
-        <View
-          style={{ justifyContent: "center", alignItems: "center", margin: 20 }}
-        >
+        <View style={styles.noRecord}>
           <Text style={styles.caption}>No record found</Text>
         </View>
       )}
