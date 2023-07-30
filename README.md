@@ -38,6 +38,8 @@
 
 &nbsp; &nbsp; &nbsp;     yarn install/npm install
 
+&nbsp; &nbsp; &nbsp;     For ios, cd ios && pod install
+
 
 &nbsp;&nbsp;<h3> Running </h3>
 
