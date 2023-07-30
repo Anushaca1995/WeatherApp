@@ -53,6 +53,7 @@ const WeatherHome = ({ navigation }) => {
     setRefreshAsync(false);
   }, [locArray, refreshAsync]);
 
+  // To retrieve search locations from async storage
   const retrieveData = async () => {
     const retrievedArray = await getArray("locArray");
     console.log("retrieved Array:", retrievedArray);
@@ -78,6 +79,7 @@ const WeatherHome = ({ navigation }) => {
     }
   };
 
+  // To store user's search location
   const saveData = async () => {
     if (!locArray.includes(locSearch)) {
       await storeArray("locArray", locArray);
@@ -176,7 +178,7 @@ const WeatherHome = ({ navigation }) => {
     setIsLoading(false);
   };
 
-  const weatherData = () => {
+  const renderWeatherDetails = () => {
     return (
       <View style={styles.weatherView}>
         {imageUrl && (
@@ -240,6 +242,7 @@ const WeatherHome = ({ navigation }) => {
       </View>
     );
   };
+  //Functional component for search
   const renderSearch = () => {
     return (
       <View style={styles.searchContainer}>
@@ -286,7 +289,7 @@ const WeatherHome = ({ navigation }) => {
           {isLoading ? (
             <ActivityIndicator size="large" color="#660022" />
           ) : (
-            weatherData()
+            renderWeatherDetails()
           )}
           <CustomButton
             buttonText={"Go to Forecast"}
