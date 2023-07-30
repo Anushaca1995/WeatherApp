@@ -1,6 +1,6 @@
 # Weather App
 
-<h4> My weather app have two screen </h4>
+<h4> Weather app have two screens </h4>
 
 &nbsp; &nbsp;<h4>1. Weather Screen</h4>
 
@@ -26,6 +26,17 @@
 
 &nbsp;&nbsp;<h4>3. Added API helpers and location helper for maitaining code quality and reusability</h4>
 
+
+&nbsp;&nbsp;<h3> Installation </h3>
+
+&nbsp; &nbsp; &nbsp;     git clone https://github.com/Anushaca1995/WeatherApp.git
+
+&nbsp; &nbsp; &nbsp;     yarn install/npm install
+
+
+&nbsp;&nbsp;<h3> Running </h3>
+
+&nbsp; &nbsp; &nbsp;     npx react-native run-android / run-ios
 
 
    
