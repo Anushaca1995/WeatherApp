@@ -1,5 +1,17 @@
 # Weather App
 
+
+<img
+  src="/img/sc1.png"
+  alt="Alt text"
+  title="Optional title"
+  style="display: inline-block; margin: 0 auto; max-width: 300px">
+  <img
+  src="/img/sc2.png"
+  alt="Alt text"
+  title="Optional title"
+  style="display: inline-block; margin: 0 auto; max-width: 300px">
+
 <h4> Weather app have two screens </h4>
 
 &nbsp; &nbsp;<h4>1. Weather Screen</h4>
